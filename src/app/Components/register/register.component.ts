@@ -1,53 +1,45 @@
 import { Component, inject } from "@angular/core";
 import {
   AbstractControl,
+  FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
 import { AuthService } from "../../core/services/auth.service";
-import { error } from "console";
 import { HttpErrorResponse } from "@angular/common/http";
+import { NgClass } from "@angular/common";
 
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: "./register.component.html",
   styleUrl: "./register.component.scss",
 })
 export class RegisterComponent {
   private readonly _authService = inject(AuthService);
+  private readonly _FormBuilder=inject(FormBuilder)
   msgError: string = "";
   isLoading: boolean = false;
-
-  registerForm: FormGroup = new FormGroup(
-    {
-      name: new FormControl(null, [
-        Validators.required,
+registerForm:FormGroup= this._FormBuilder.group({
+  name:[null,[        Validators.required,
         Validators.minLength(3),
-        Validators.maxLength(20),
-      ]),
-      email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [
-        Validators.required,
+        Validators.maxLength(20),]],
+    email:[null,[Validators.required, Validators.email]],
+    password:[null,[        Validators.required,
         Validators.minLength(8),
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/),
-      ]),
-          rePassword: new FormControl(null, [
-      Validators.required,
+      ]],
+      rePassword:[null,[      Validators.required,
       Validators.minLength(8),
-      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/),
-    ]),
-      phone: new FormControl(null, [
-        Validators.required,
-        Validators.pattern(/^01[0125][0-9]{8}$/),
-      ]),
-    },
-    this.confirmPassword,
-  );
-
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/),]],
+      phone:[null,[        Validators.required,
+        Validators.pattern(/^01[0125][0-9]{8}$/),]]
+},{
+  validators:this.confirmPassword
+})
   confirmPassword(g: AbstractControl) {
     if (g.get("password")?.value === g.get("rePassword")?.value) {
       return null;
@@ -57,19 +49,25 @@ export class RegisterComponent {
       };
     }
   }
-registerSubmit(): void {
+logFormErrors(): void {
+  // 1. Log Form-Level Group Errors (e.g., confirmPassword mismatch)
+  if (this.registerForm.errors) {
+    console.warn('Form-level Errors:', this.registerForm.errors);
+  }
 
+  // 2. Log Only Invalid Individual Controls
+  Object.keys(this.registerForm.controls).forEach((key) => {
+    const control = this.registerForm.get(key);
+    if (control && control.invalid) {
+      console.warn(`Control [${key}] is invalid:`, control.errors);
+    }
+  });
+}
+
+registerSubmit(): void {
   if (this.registerForm.invalid) {
     this.registerForm.markAllAsTouched();
-
-    console.log(this.registerForm.errors);
-
-    Object.keys(this.registerForm.controls).forEach(key => {
-      const control = this.registerForm.get(key);
-
-      console.log(key, control?.errors);
-    });
-
+    this.logFormErrors();
     return;
   }
 
@@ -86,4 +84,5 @@ registerSubmit(): void {
     }
   });
 }
+
 }
