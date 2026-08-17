@@ -10,6 +10,7 @@ import {
 import { AuthService } from "../../core/services/auth.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NgClass } from "@angular/common";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-register",
@@ -21,8 +22,10 @@ import { NgClass } from "@angular/common";
 export class RegisterComponent {
   private readonly _authService = inject(AuthService);
   private readonly _FormBuilder=inject(FormBuilder)
+  private readonly _Router=inject(Router)
   msgError: string = "";
   isLoading: boolean = false;
+  isSuccessRegister: boolean = false;
 registerForm:FormGroup= this._FormBuilder.group({
   name:[null,[        Validators.required,
         Validators.minLength(3),
@@ -65,6 +68,7 @@ logFormErrors(): void {
 }
 
 registerSubmit(): void {
+  this.msgError="";
   if (this.registerForm.invalid) {
     this.registerForm.markAllAsTouched();
     this.logFormErrors();
@@ -76,6 +80,12 @@ registerSubmit(): void {
   this._authService.setRegisterForm(this.registerForm.value).subscribe({
     next: (res) => {
       console.log(res);
+      if(res.message=='success'){
+        this.isSuccessRegister=true;
+        setTimeout(() => {
+          this._Router.navigate(['/login'])
+        }, 3000);
+      }
       this.isLoading = false;
     },
     error: (err: HttpErrorResponse) => {
