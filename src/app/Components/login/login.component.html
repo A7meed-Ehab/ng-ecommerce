@@ -1,24 +1,63 @@
-<section class="bg-main-light shadow p-2 my-2 rounded-4">
-  <h2 class="h1 text-main">Register Now:</h2>
-  <form [formGroup]="loginForm">
-    <div class="my-2">
-      <label for="email">Enter The Email</label>
+<section class="bg-main-light shadow p-4 my-4 rounded-4 w-75 mx-auto">
+  <h2 class="h1 text-main mb-3">Login Now:</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="loginSubmit()">
+    
+    <!-- Email Field -->
+    <div class="mb-3">
+      <label for="email" class="form-label">Email Address</label>
       <input
-        type="text"
+        type="email"
         id="email"
         formControlName="email"
         class="form-control"
       />
+      
+      <!-- Validation Messages -->
+      @if (loginForm.get('email')?.errors && loginForm.get('email')?.touched) {
+        <div class="alert alert-danger my-2 p-2 small">
+          @if (loginForm.get('email')?.getError('required')) {
+            <p class="m-0">Email is required.</p>
+          }
+          @if (loginForm.get('email')?.getError('email')) {
+            <p class="m-0">Please enter a valid email address.</p>
+          }
+        </div>
+      }
     </div>
-    <div class="my-2">
-      <label for="username">Enter The Password</label>
+
+    <!-- Password Field -->
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
       <input
-        type="text"
+        type="password"
         id="password"
         formControlName="password"
         class="form-control"
       />
+
+      <!-- Validation Messages -->
+      @if (loginForm.get('password')?.errors && loginForm.get('password')?.touched) {
+        <div class="alert alert-danger my-2 p-2 small">
+          @if (loginForm.get('password')?.getError('required')) {
+            <p class="m-0">Password is required.</p>
+          }
+        </div>
+      }
     </div>
-    <button type="submit">Login</button>
+
+    <!-- Submit Button -->
+    <button 
+      class="btn btn-main ms-auto d-block" 
+      type="submit" 
+      [disabled]="loginForm.invalid || isLoading"
+    >
+      @if (isLoading) {
+        <span><i class="fas fa-spin fa-spinner me-2"></i>Loading...</span>
+      } @else {
+        <span>Login</span>
+      }
+    </button>
+
   </form>
 </section>
