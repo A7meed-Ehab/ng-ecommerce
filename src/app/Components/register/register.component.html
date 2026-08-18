@@ -12,10 +12,14 @@
             registerForm.get('name')?.touched &&
             registerForm.get('name')?.invalid,
         }"
-      id="name" type="text" class="form-control" formControlName="name" />
+        id="name"
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
       @if (
-       registerForm.get("name")?.errors &&
-        (  registerForm.get("name")?.touched || registerForm.get("name")?.dirty)
+        registerForm.get("name")?.errors &&
+        (registerForm.get("name")?.touched || registerForm.get("name")?.dirty)
       ) {
         <div class="alert alert-danger w-50">
           @if (registerForm.get("name")?.getError("required")) {
